@@ -88,26 +88,26 @@ exports.fetchCourseGrade = async (req, res) => {
     let result = {};
 
     // Fetching Student documents
-    const student = await Student.findOne({ name: req.body.student_name }).exec();
+    const student = await Student.findOne({ name: req.body.student_name }).setOptions({ lean: true }).exec();
     result.student = student;
 
     // Fetching GradeReport documents
-    const gradeReports = await require('../model/GradeReportModel').find({ student_number: student.student_number }).exec();
+    const gradeReports = await require('../model/GradeReportModel')
+      .find({ student_number: student.student_number })
+      .setOptions({ lean: true })
+      .exec();
 
-    const sections = [];
+    const courseList = [];
     // Fetching Section documents by using gradeReport
     for (let gradeReport of gradeReports) {
       const section = await fetchSections(gradeReport.section_identifier);
-      sections.push(section);
-    }
-    result['gradeReports'] = gradeReports;
-
-    const courses = [];
-    for (let section of sections) {
       const course = await fetchCourses(section.course_number);
-      courses.push(course);
+      // console.log('grade report ===========> ', gradeReport);
+      // console.log('course ===========> ', a);
+      // console.log('\n');
+      courseList.push({ ...course, grade_report: gradeReport });
     }
-    result['courses'] = courses;
+    result['courses'] = courseList;
 
     res.json({
       status: 'success',
@@ -119,13 +119,9 @@ exports.fetchCourseGrade = async (req, res) => {
 };
 
 const fetchSections = async section_identifier => {
-  console.log('section_identifier in fetchSections =====> ', section_identifier);
-  const section = await require('../model/SectionModel').findOne({ section_identifier: section_identifier }).exec();
-  return section;
+  return await require('../model/SectionModel').findOne({ section_identifier: section_identifier }).setOptions({ lean: true }).exec();
 };
 
 const fetchCourses = async course_number => {
-  console.log('course_number in fetchCourses =====> ', course_number);
-  const course = await require('../model/CourseModel').findOne({ course_number: course_number }).exec();
-  return course;
+  return await require('../model/CourseModel').findOne({ course_number: course_number }).setOptions({ lean: true }).exec();
 };
