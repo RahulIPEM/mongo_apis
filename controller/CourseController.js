@@ -46,7 +46,7 @@ exports.view = function (req, res) {
 };
 // Handle update contact info
 exports.update = function (req, res) {
-  Course.findById(req.params.contact_id, function (err, course) {
+  Course.findById(req.params.course_id, function (err, course) {
     if (err) res.send(err);
     course.course_name = req.body.course_name ? req.body.course_name : course.course_name;
     course.course_number = req.body.course_number;

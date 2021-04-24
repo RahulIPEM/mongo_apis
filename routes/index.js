@@ -69,7 +69,10 @@ router
   .put(prerequisiteController.update)
   .delete(prerequisiteController.delete);
 
-router.route('/fetch/user/course/grade').post(studentController.fetchCourseGrade);
+var utilityController = require('../controller/UtilityController');
+router.route('/fetch/user/course/grade').post(utilityController.fetchCourseGrade);
+router.route('/fetch/student/course/grade').post(utilityController.fetchStudentCourseGrade);
+router.route('/fetch/prerequisite/course').post(utilityController.fetchPrerequisiteCourse);
 
 // Export API routes
 module.exports = router;
